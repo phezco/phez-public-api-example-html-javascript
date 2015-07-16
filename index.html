@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Phez Public API Example (HTML, JavaScript, jQuery)</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+</head>
+
+<body>
+  <h1>Phez Public API Example (HTML, JavaScript, jQuery)</h1>
+
+  <h2>Top Posts</h2>
+  <div id="posts">
+    Loading...
+  </div>
+
+  <h2>Top Subphezes</h2>
+  <div id="subphezes">
+    Loading...
+  </div>
+
+  <h2>User Details</h2>
+  <div id="user_details">
+    Loading...
+  </div>
+
+  <h2>User Posts</h2>
+  <div id="user_posts">
+    Loading...
+  </div>
+
+  <h2>Subphez Top Posts</h2>
+  <div id="subphez_top">
+    Loading...
+  </div>
+
+<script>
+
+$(document).ready(function() {
+  console.log('jQuery loaded...');
+  load_posts();
+  load_top_subphezes();
+  // Replace with your username or desired username to show:
+  var username = 'p4x';
+  load_user(username);
+  // Subphez path
+  var subphez = 'bitcoin';
+  load_subphez(subphez);
+});
+
+function load_posts() {
+  $.ajax({
+    url: "http://phez.co/api/v1/posts/all"
+    //url: "http://localhost:3000/api/v1/posts/all"
+  }).then(function(data) {
+    var html = '';
+    $.each(data, function(i, obj) {
+      // demonstration purposes only. a templating language like Handlebars.js
+      //  or {{ mustache }} is probably preferable to building html like this:
+      html += '<a href="' + obj.url + '">' + obj.title + '</a><br/>';
+    });
+    $('#posts').html(html);
+  });
+}
+
+function load_top_subphezes() {
+  $.ajax({
+    url: "http://phez.co/api/v1/subphezes/top"
+  }).then(function(data) {
+    var html = '';
+    $.each(data, function(i, obj) {
+      html += '<a href="' + obj.url + '">' + obj.title + '</a> ' + obj.subscriber_count + ' subscribers<br/>';
+    });
+    $('#subphezes').html(html);
+  });
+}
+
+function load_user(username) {
+  $.ajax({
+    url: "http://phez.co/api/v1/profiles/" + username + "/details"
+  }).then(function(data) {
+    var html = '<h3>' + username + ' karma</h3>';
+    html += 'Link karma: ' + data.link_karma + '<br>Comment karma: ' + data.comment_karma;
+    $('#user_details').html(html);
+  });
+
+  $.ajax({
+    url: "http://phez.co/api/v1/profiles/" + username + "/posts"
+  }).then(function(data) {
+    var html = '';
+    $.each(data, function(i, obj) {
+      html += '<a href="' + obj.url + '">' + obj.title + '</a><br/>';
+    });
+    $('#user_posts').html(html);
+  });
+
+}
+
+function load_subphez(subphez) {
+  $.ajax({
+    url: "http://phez.co/api/v1/subphezes/" + subphez + "/all"
+  }).then(function(data) {
+    var html = '<h3>' + subphez + ' top posts</h3>';
+    $.each(data, function(i, obj) {
+      html += '<a href="' + obj.url + '">' + obj.title + '</a><br/>';
+    });
+    $('#subphez_top').html(html);
+  });
+}
+</script>
+</body>
+</html>
